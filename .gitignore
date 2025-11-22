@@ -1,0 +1,12 @@
+# Ignore compiled object files
+*.o
+# Ignore executables
+*.exe
+*.out
+# Ignore dependency and log files
+*.d
+*.log
+# Ignore IDE-specific or project settings
+.vscode/
+*.swp
+*.db
