@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h> //for rand()
+#include <time.h>
 #include <ctype.h>
 #include <string.h>
 
@@ -28,16 +29,16 @@ int RandomLetter(int LetterCount[26], int *bagptr){
 }
 
 int VerifyWord(char letters[26], char word[7], int rack[7], int LetterCount[26], int *bagptr) {
-    
+
     int i, j;
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < strlen(word); i++) {
         word[i] = tolower(word[i]); // All the words in our files are in lowercase, so we do the same here.   
     }
     
     // Checking: if word exists in the pre written file for valid words //
     char initialLetter = word[0];      //We are constructing the name of the file to open through the user's entered word.
-    char fileName[5];
-    sprintf(fileName, "%c.txt", initialLetter);
+    char fileName[20];
+    sprintf(fileName, "words/%c.txt", initialLetter);
 
     FILE *fp = fopen(fileName, "r");
     char line[50];
@@ -46,6 +47,7 @@ int VerifyWord(char letters[26], char word[7], int rack[7], int LetterCount[26],
         printf("Could not open file for reading.\n");
         return 0;
     }
+
     int wordFound = 0;
     while(fgets(line, 50, fp) != NULL) {
 
@@ -54,39 +56,80 @@ int VerifyWord(char letters[26], char word[7], int rack[7], int LetterCount[26],
         if (lenOfLineRead > 0 && line[lenOfLineRead - 1] == '\n') {
             line[lenOfLineRead - 1] = '\0';
         }
+
         if (strcmp(word, line) == 0) {
             wordFound = 1;
             break;
         }
     }
     fclose(fp);
+
     if (wordFound == 0) {
-        return 3;
+        for(i = 0 ; i<7 ; i++){
+            if (rack[i] >= 0 && rack[i] < 26){
+                LetterCount[rack[i]]++;    //incrementing counts of all letters in rack because all are unused
+            }
+        }
+        (*bagptr) += 7;  //incrementing bag by 7
+        return 3; //word not in dictionary
     }
         
-    char tempRack[7];
+    char LetterRack[7]; //an array tht will store letters of rack
     for (i = 0; i < 7; i++) {
-        tempRack[i] = letters[rack[i]];
+        LetterRack[i] = tolower(letters[rack[i]]);
     }
+
     for (i = 0; i < strlen(word); i++) {
+        int found = 0;
+        for(j=0; j< 7 ; j++) {  
+            if (word[i] == LetterRack[j]) {  // comparing word letter with rack letter
+                LetterRack[j] = '0';
+                rack[j] = -1; //to show in rack tht a letter is gone
+                found = 1;
+                break; //stops looping if the letter is found
+            }
+        }
+        if (found == 0) {
+            for(j = 0 ; j<7 ; j++){
+                if (rack[j] >= 0 && rack[j] < 26){
+                    LetterCount[rack[j]]++;    //incrementing counts of all letters in rack because all are unused
+                }
+            }
+            (*bagptr) += 7;  //incrementing bag by 7
+            return 2; //word doesnt have same letters as rack
+        }
+    }
 
-       // int letterUsed = 0;
-        for (j = 0; j < 7; j++) {
-
-            if (word[i] == tempRack[j]) {  // comparing word with rack
-                tempRack[j] = '0';
-                //letterUsed = 1;
-                break;
-            }  
-        } 
-       /* if (letterUsed == 0) {
-
+    //if everything is correct, word exists and word has letters as the rack,
+    //we have to increment the unused letters ad bag
+    for(i=0; i<7 ; i++){
+        if(!(rack[i] == -1)){
+            LetterCount[rack[i]]++;
             (*bagptr)++;
-            (LetterCount[i]++);
-            return 2;
-        } */
+        }
     }
     return 1;
+}
+
+int CalculateScore(char word[7], int LetterScore[26]){
+    int index , i, score = 0;
+    for(i=0;i<strlen(word);i++){
+        index = toupper(word[i]) - 65; //stores value 0-25 in word index according to letter in word[i]
+        score += LetterScore[index];
+    }
+    return score;
+}
+
+int Result(int PlayerPoints[2]){
+    //1. it will display player names
+    //2. it will display player points
+    //3. it will display winner
+    //4. it will return 1, 2 or 3 (1 if p1 is winner, 2 if p2 is winner, 3 if tied)
+}
+
+void UpdateGameHistoryFile(int PlayerPoints[2], int result){
+    //1. open gamehistory.txt in append
+    //2. sprintf names , playerpoints, result
 }
 
 int main() {
@@ -108,7 +151,8 @@ int main() {
     int i,j; 
     int rack[7];
     int repeat = 1; //if repeat == 0 loop stops game stops 
-    
+    srand(time(NULL)); // for rand()
+
     while(repeat == 1){
         for(i=0 ; i<2 ; i++) { 
             printf("\n%s's turn:\n", players[i]);  //e.g. meesam's turn:
@@ -133,25 +177,22 @@ int main() {
             printf("Enter Your Word : ");
             scanf("%s", word);
 
-            x = VerifyWord(letters, word, rack, LetterCount , bagptr);   // this will take the word as parameter and return 1 if the word is correct else 0
-            
-            printf("\n%d\n", x); //testing
-            
-            if(x == 1) {
-
-                printf("WORD MATCHED!!!!"); // AsadADDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA   TESTING
-
-                //score = CalculateScore(word) ;
-                //printf("%s score is %d", players[i], score) ;
-                //PlayerPoints[i] += score;  //updates total score of each player
-                //score = 0;
-                //x=0;
-            }
-            else if(x == 2) { 
-                printf("%s Doesn't have same letters as given rack!!! \n", word);
-            }
-            else if (x == 3) {
-                printf("%s Does not exist! \n" , word);
+            x = VerifyWord(letters, word, rack, LetterCount , bagptr);
+            switch(x){
+                case 1:
+                    printf("\nWORD MATCHED!!!!\n");
+                    score = CalculateScore(word,LetterScore);
+                    printf("%s score is %d", players[i], score) ;
+                    PlayerPoints[i] += score;  //updates total score of each player
+                    printf("\nTotal score = %d\n\n", PlayerPoints[i]);
+                    score = 0;
+                    break;
+                case 2:
+                    printf("%s doesn't have same letters as given rack!!! \n", word);
+                    break;
+                case 3:
+                    printf("%s does not exist! \n" , word);
+                    break;
             }
         }
         if(bag < 16) {
@@ -160,10 +201,10 @@ int main() {
         }
         printf("\nIF you want to END the game press 0 ELSE press 1  : ");
         scanf("%d" , &repeat);
-
     }
     printf("\n\t\t-----GAME END-----");
-    //Result(players , PlayerPoints); //displays final scores and winner or tied with a message 
-    //UpdateGameHistoryFile() ; //this will append the file of player data with names,scores, and winner
+    //int result;
+    //result = Result(PlayerPoints); //displays names, final scores and winner or tied with a message , and return result (1 = player 1 win , 2 = player 2 win , 3 = tied) 
+    //UpdateGameHistoryFile(PlayerPoints, result) ; //this will append the file of gamehistory.txt with names,scores, and winner
     return 0;
 }
