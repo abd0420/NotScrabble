@@ -120,31 +120,43 @@ int CalculateScore(char word[7], int LetterScore[26]){
     return score;
 }
 
-int Result(int PlayerPoints[2]){
-    //1. it will display player names
-    //2. it will display player points
-    //3. it will display winner
-    //4. it will return 1, 2 or 3 (1 if p1 is winner, 2 if p2 is winner, 3 if tied)
+int Result(int playerPoints[2]) {
+    printf("\t\t FINAL RESULT\n");
+    printf("\t| P1: %s\tScore: %d |\n", players[0], playerPoints[0]);
+    printf("\t| P2: %s\tScore: %d |\n", players[1], playerPoints[1]);
+
+    if(playerPoints[0] > playerPoints[1]) {
+        printf("\n\t\tWINNER IS: %s\n", players[0]);
+        return 1;
+    }
+    else if(playerPoints[1] > playerPoints[0]) {
+        printf("\n\t\tWINNER IS: %s\n", players[1]);
+        return 2;
+    }
+    else {
+        printf("\n\t\tGAME DRAW :(\n");
+        return 3;
+    }
 }
 
-void UpdateGameHistoryFile(int PlayerPoints[2], int result){
+void UpdateGameHistoryFile(int playerPoints[2], int result){
     //1. open gamehistory.txt in append
     //2. sprintf names , playerpoints, result
 }
 
 int main() {
     
-    takeUserNames(); // extracted user input process into a dedicated function, achieved a more readable main() function body.
+    takeUserNames(); // extracted user input process into a dedicated function, achieved a more readable function body.
 
     char letters[26] =   {'A','B','C','D','E','F','G','H','I','J','K','L','M',
-                                'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'} ; 
-    const int LetterScore[26] = {1,3,3,2,1,4,2,4,1,8,5,1,3,1,1,3,10,1,1,1,1,4,4,8,4,10}; //stored in order of alphabets
+                          'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'} ; 
+    int LetterScore[26] = {1,3,3,2,1,4,2,4,1,8,5,1,3,1,1,3,10,1,1,1,1,4,4,8,4,10}; //stored in order of alphabets
     int LetterCount[26]    =    {9,2,2,4,12,2,3,2,9,1,1,4,2,6,8,2,1,6,4,6,4,2,2,1,2,1};  //stored in order of alphabets
     
     int bag = 100; //stores count of total letters available
     int*bagptr = &bag ; //making a pointer to bag bcz we cant update the bag value inside another functions so we update at its memory
     
-    int PlayerPoints[2] = {0,0} ; //total score of both players
+    int playerPoints[2] = {0,0} ; //total score of both players
     int x = 0, score = 0;
     char word[7];
 
@@ -183,8 +195,8 @@ int main() {
                     printf("\nWORD MATCHED!!!!\n");
                     score = CalculateScore(word,LetterScore);
                     printf("%s score is %d", players[i], score) ;
-                    PlayerPoints[i] += score;  //updates total score of each player
-                    printf("\nTotal score = %d\n\n", PlayerPoints[i]);
+                    playerPoints[i] += score;  //updates total score of each player
+                    printf("\nTotal score = %d\n\n", playerPoints[i]);
                     score = 0;
                     break;
                 case 2:
@@ -202,9 +214,9 @@ int main() {
         printf("\nIF you want to END the game press 0 ELSE press 1  : ");
         scanf("%d" , &repeat);
     }
-    printf("\n\t\t-----GAME END-----");
-    //int result;
-    //result = Result(PlayerPoints); //displays names, final scores and winner or tied with a message , and return result (1 = player 1 win , 2 = player 2 win , 3 = tied) 
-    //UpdateGameHistoryFile(PlayerPoints, result) ; //this will append the file of gamehistory.txt with names,scores, and winner
+    printf("\n\t\t-----GAME END-----\n\n");
+    int result;
+    result = Result(playerPoints); //displays names, final scores and winner or tied with a message , and return result (1 = player 1 win , 2 = player 2 win , 3 = tied) 
+    //UpdateGameHistoryFile(playerPoints, result) ; //this will append the file of gamehistory.txt with names,scores, and winner
     return 0;
 }
