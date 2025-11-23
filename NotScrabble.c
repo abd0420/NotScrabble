@@ -8,7 +8,7 @@ char players[2][50]; //two players with length 50
 
 char takeUserNames() {
 
-    printf("\n\n\t\t------NotScrabble------\n");
+    printf("\n\t\t------NotScrabble------\n");
     printf("Enter player 1 name : ");
     scanf("%s" , players[0]);
     printf("Enter player 2 name : ");
@@ -139,9 +139,26 @@ int Result(int playerPoints[2]) {
     }
 }
 
-void UpdateGameHistoryFile(int playerPoints[2], int result){
-    //1. open gamehistory.txt in append
-    //2. sprintf names , playerpoints, result
+void UpdateGameHistoryFile(int playerPoints[2], int result) {
+
+    FILE *fp = fopen("gamehistory.txt", "a");
+    if (fp == NULL) {
+        printf("Error opening file.\n");
+    }
+    char *gameWinner;  
+    if (result == 1) {
+        gameWinner = players[0]; 
+    }
+    else if(result == 2) {
+        gameWinner = players[1];
+    }
+    else {
+        gameWinner = "Draw";
+    }
+    fprintf(fp, "%s,%s,%d,%d,%s\n", players[0], players[1], playerPoints[0], playerPoints[1], gameWinner);
+
+    fclose(fp);
+   
 }
 
 int main() {
@@ -151,7 +168,7 @@ int main() {
     char letters[26] =   {'A','B','C','D','E','F','G','H','I','J','K','L','M',
                           'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'} ; 
     int LetterScore[26] = {1,3,3,2,1,4,2,4,1,8,5,1,3,1,1,3,10,1,1,1,1,4,4,8,4,10}; //stored in order of alphabets
-    int LetterCount[26]    =    {9,2,2,4,12,2,3,2,9,1,1,4,2,6,8,2,1,6,4,6,4,2,2,1,2,1};  //stored in order of alphabets
+    int LetterCount[26] = {9,2,2,4,12,2,3,2,9,1,1,4,2,6,8,2,1,6,4,6,4,2,2,1,2,1};  //stored in order of alphabets
     
     int bag = 100; //stores count of total letters available
     int*bagptr = &bag ; //making a pointer to bag bcz we cant update the bag value inside another functions so we update at its memory
@@ -168,7 +185,7 @@ int main() {
     while(repeat == 1){
         for(i=0 ; i<2 ; i++) { 
             printf("\n%s's turn:\n", players[i]);  //e.g. meesam's turn:
-            for(j=0 ; j<7; j++){
+            for(j=0 ; j<7; j++) {
                 rack[j] = RandomLetter(LetterCount, bagptr);
             }
             
@@ -190,20 +207,17 @@ int main() {
             scanf("%s", word);
 
             x = VerifyWord(letters, word, rack, LetterCount , bagptr);
-            switch(x){
+            switch(x) {
                 case 1:
-                    printf("\nWORD MATCHED!!!!\n");
                     score = CalculateScore(word,LetterScore);
-                    printf("%s score is %d", players[i], score) ;
                     playerPoints[i] += score;  //updates total score of each player
-                    printf("\nTotal score = %d\n\n", playerPoints[i]);
                     score = 0;
                     break;
                 case 2:
-                    printf("%s doesn't have same letters as given rack!!! \n", word);
+                    printf("%s Doesn't have same letters as given rack!!! \n", word);
                     break;
                 case 3:
-                    printf("%s does not exist! \n" , word);
+                    printf("%s Does not exist! \n" , word);
                     break;
             }
         }
@@ -211,12 +225,13 @@ int main() {
             printf("Insufficient letters available.\n");
             break;
         }
-        printf("\nIF you want to END the game press 0 ELSE press 1  : ");
+        printf("\nIf you want to END the game press 0 ELSE press 1  : ");
         scanf("%d" , &repeat);
     }
     printf("\n\t\t-----GAME END-----\n\n");
+    
     int result;
     result = Result(playerPoints); //displays names, final scores and winner or tied with a message , and return result (1 = player 1 win , 2 = player 2 win , 3 = tied) 
-    //UpdateGameHistoryFile(playerPoints, result) ; //this will append the file of gamehistory.txt with names,scores, and winner
+    UpdateGameHistoryFile(playerPoints, result) ; //this will append the file of gamehistory.txt with names,scores, and winner
     return 0;
 }
