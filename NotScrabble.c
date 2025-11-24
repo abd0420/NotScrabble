@@ -6,7 +6,36 @@
 
 char players[2][50]; //two players with length 50
 
-char takeUserNames() {
+// displaying the welcome text, disclaimer, and then clear the screen
+void showWelcomeScreen() {
+        printf("\n============================================\n");
+        printf("\tWELCOME TO NotScrabble\n");
+        printf("============================================\n");
+        printf("This is a simple word-making game for two players.\n");
+        printf("Each round, you will receive 7 random letters.\n");
+        printf("Your job is to form a valid English word using ONLY the\n");
+        printf("letters in your rack.\n");
+        
+        printf("\nScoring is based on letter values.\n");
+        printf("Invalid words or wrong letters will give you a penalty.\n");
+        printf("Each player has a maximum of 3 penalties.\n");
+        
+        printf("\n------------------- DISCLAIMER -------------------\n");
+        printf("NOTE: This game relies on local word files (words/*.txt).\n");
+        printf("It is not responsible for missing, incomplete, or \n");
+        printf("incorrect word lists. Check word files for accuracy.\n");
+        printf("--------------------------------------------------\n");
+        
+        printf("\nPress ENTER to begin...\n");
+        
+        fflush(stdin); // clears the newline character from previous input.
+        getchar(); // waiting for user to press 'enter'
+
+        // Clear the screen after the user presses Enter.
+        system("cls");
+    }
+
+void takeUserNames() {
 
     printf("\n\t\t------NotScrabble------\n\n");
     printf("Enter player 1 name : ");
@@ -16,7 +45,7 @@ char takeUserNames() {
 
 }
 
-int RandomLetter(int LetterCount[26], int *bagptr){
+int RandomLetter(int LetterCount[26], int *bagptr) {
     int r;
     do {
         r = rand() % 26;
@@ -129,20 +158,28 @@ int CalculateScore(char word[7], int LetterScore[26]){
 }
 
 int Result(int playerPoints[2]) {
-    printf("\t\t FINAL RESULT\n");
+    printf("\n\n\t\tFINAL RESULT\n\n");
     printf("\t| P1: %s\tScore: %d |\n", players[0], playerPoints[0]);
     printf("\t| P2: %s\tScore: %d |\n", players[1], playerPoints[1]);
 
     if(playerPoints[0] > playerPoints[1]) {
-        printf("\n\t\tWINNER IS: %s\n", players[0]);
+        //printf("\n\t\tWINNER IS: %s\n", players[0]);
+        printf("\n============================================\n");
+        printf("\t\tWINNER IS: %s\n", players[0]);
+        printf("============================================\n");
         return 1;
     }
     else if(playerPoints[1] > playerPoints[0]) {
-        printf("\n\t\tWINNER IS: %s\n", players[1]);
+        //printf("\n\t\tWINNER IS: %s\n", players[1]);
+        printf("\n============================================\n");
+        printf("\t\tWINNER IS: %s\n", players[1]);
+        printf("============================================\n");
         return 2;
     }
     else {
-        printf("\n\t\tGAME DRAW(\n");
+        printf("\n============================================\n");
+        printf("\t\tGAME DRAW");
+        printf("\n============================================\n");
         return 3;
     }
 }
@@ -171,6 +208,7 @@ void UpdateGameHistoryFile(int playerPoints[2], int result) {
 
 int main() {
     
+    showWelcomeScreen();
     takeUserNames(); // extracted user input process into a dedicated function, achieved a more readable function body.
 
     char letters[26] =   {'A','B','C','D','E','F','G','H','I','J','K','L','M',
@@ -193,7 +231,9 @@ int main() {
 
     while(repeat == 1 && penalties[0] != 3 && penalties[1] != 3 && bag > 16){
         for(i=0 ; i<2 ; i++) { 
-            printf("\n%s's turn:\n", players[i]);  //e.g. meesam's turn:
+            printf("\n\n############################################\n");
+            printf("\t%s's Turn (Penalties: %d/%d)\n", players[i], penalties[i], 3);
+            printf("############################################\n");  //e.g. meesam's turn:
             for(j=0 ; j<7; j++) {
                 rack[j] = RandomLetter(LetterCount, bagptr);
             }
@@ -245,7 +285,7 @@ int main() {
         }
 
         if(penalties[0] != 3 && penalties[1] != 3){ //checking if any of the player has penalties then game has to end without asking
-            printf("\nIf you want to END the game press 0 ELSE press 1  : ");
+            printf("\nDo you want to continue? (1 for YES / 0 for NO): ");
             scanf("%d" , &repeat);
         }
     }
@@ -263,7 +303,6 @@ int main() {
             printf("\n%s have 3 Penalties so...\n\n", players[1]);
         }
     }
-    printf("\n\t\t-----GAME END-----\n\n");
     
     int result;
     result = Result(playerPoints); //displays names, final scores and winner or tied with a message , and return result (1 = player 1 win , 2 = player 2 win , 3 = tied) 
