@@ -260,7 +260,7 @@ int main() {
             printf("\n%s have 3 Penalties so...\n\n", players[0]);
         } 
         else if(penalties[1] == 3){
-            printf("\n%s have 3 Penalties so...\n\n", players[0]);
+            printf("\n%s have 3 Penalties so...\n\n", players[1]);
         }
     }
     printf("\n\t\t-----GAME END-----\n\n");
