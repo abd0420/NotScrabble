@@ -27,7 +27,7 @@ int main() {
     showWelcomeScreen();
     takeUserNames();
 
-    int bag = 100; //stores count of total letters available
+    int bag = 100; //stores count of total letters in bag
     int*bagptr = &bag ; //making a pointer to bag bcz we cant update the bag value inside another functions so we update at its memory
     
     int playerPoints[2] = {0,0} ; //total score of both players
