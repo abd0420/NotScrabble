@@ -1,4 +1,0 @@
-abd,bad,7,3,abd
-abd,bad,0,0,Draw
-abd,bad,0,3,bad
-abd,bad,0,0,Draw

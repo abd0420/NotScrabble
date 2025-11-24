@@ -35,12 +35,12 @@ int main() {
     int x = 0, score = 0;
     char word[50];
 
-    int i,j; 
+    int i; 
     int rack[7];
     int repeat = 1; //if repeat == 0 loop stops game stops 
     srand(time(NULL)); // for rand()
 
-    while(repeat == 1 && penalties[0] != 3 && penalties[1] != 3 && bag > 16){
+    while(repeat == 1 && penalties[0] != 3 && penalties[1] != 3 && bag > 16) {
         for(i=0 ; i<2 ; i++) { 
             
             fillRack(rack, LetterCount, bagptr);
